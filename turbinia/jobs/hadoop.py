@@ -45,8 +45,7 @@ class HadoopAnalysisJob(interface.TurbiniaJob):
     Returns:
         A list of tasks to schedule.
     """
-    tasks = [HadoopAnalysisTask() for _ in evidence]
-    return tasks
+    return [HadoopAnalysisTask() for _ in evidence]
 
 
 manager.JobsManager.RegisterJob(HadoopAnalysisJob)

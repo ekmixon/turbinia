@@ -45,8 +45,7 @@ class WordpressCredsAnalysisJob(interface.TurbiniaJob):
     Returns:
         A list of tasks to schedule.
     """
-    tasks = [wordpress_creds.WordpressCredsAnalysisTask() for _ in evidence]
-    return tasks
+    return [wordpress_creds.WordpressCredsAnalysisTask() for _ in evidence]
 
 
 manager.JobsManager.RegisterJob(WordpressCredsAnalysisJob)

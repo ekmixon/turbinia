@@ -41,8 +41,7 @@ class DockerContainersEnumerationJob(interface.TurbiniaJob):
     Returns:
         A list of tasks to schedule.
     """
-    tasks = [DockerContainersEnumerationTask() for _ in evidence]
-    return tasks
+    return [DockerContainersEnumerationTask() for _ in evidence]
 
 
 manager.JobsManager.RegisterJob(DockerContainersEnumerationJob)

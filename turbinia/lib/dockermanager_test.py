@@ -159,8 +159,7 @@ class TestContainerManager(unittest.TestCase):
     # Ensure correct file path formmating.
     mock_blockcheck.return_value = False
     file_smpl = ['/path/to/file']
-    file_formatted = {}
-    file_formatted[file_smpl[0]] = {'bind': file_smpl[0], 'mode': 'rw'}
+    file_formatted = {file_smpl[0]: {'bind': file_smpl[0], 'mode': 'rw'}}
     _, file_paths = self.container_mgr._create_mount_points(file_smpl)
     assert file_formatted == file_paths
 

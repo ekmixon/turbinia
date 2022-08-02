@@ -58,11 +58,11 @@ class PlasoTask(TurbiniaTask):
         'Generating Plaso command line from arguments: {0!s}'.format(conf),
         level=logging.DEBUG)
     cmd = [base_command]
+    cli_args = [
+        'status_view', 'hashers', 'partitions', 'vss_stores',
+        'artifact_filters', 'file_filter', 'yara_rules'
+    ]
     for k, v in conf.items():
-      cli_args = [
-          'status_view', 'hashers', 'partitions', 'vss_stores',
-          'artifact_filters', 'file_filter', 'yara_rules'
-      ]
       if (k not in cli_args or not v):
         continue
       prepend = '-'

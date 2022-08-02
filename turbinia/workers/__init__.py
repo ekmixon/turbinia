@@ -121,7 +121,7 @@ class TurbiniaTaskResult:
     """Initialize the TurbiniaTaskResult object."""
 
     self.closed = False
-    self.evidence = evidence if evidence else []
+    self.evidence = evidence or []
     self.input_evidence = input_evidence
     self.id = uuid.uuid4().hex
     self.job_id = job_id
@@ -197,7 +197,7 @@ class TurbiniaTaskResult:
     if not status and self.successful:
       status = 'Completed successfully in {0:s} on {1:s}'.format(
           str(self.run_time), self.worker_name)
-    elif not status and not self.successful:
+    elif not status:
       status = 'Run failed in {0:s} on {1:s}'.format(
           str(self.run_time), self.worker_name)
     self.log(status)
@@ -426,17 +426,13 @@ class TurbiniaTask:
   def __init__(
       self, name=None, base_output_dir=None, request_id=None, requester=None):
     """Initialization for TurbiniaTask."""
-    if base_output_dir:
-      self.base_output_dir = base_output_dir
-    else:
-      self.base_output_dir = config.OUTPUT_DIR
-
+    self.base_output_dir = base_output_dir or config.OUTPUT_DIR
     self.id = uuid.uuid4().hex
     self.is_finalize_task = False
     self.job_id = None
     self.job_name = None
     self.last_update = datetime.now()
-    self.name = name if name else self.__class__.__name__
+    self.name = name or self.__class__.__name__
     self.output_dir = None
     self.output_manager = output_manager.OutputManager()
     self.result = None
@@ -445,7 +441,7 @@ class TurbiniaTask:
     self.stub = None
     self.tmp_dir = None
     self.turbinia_version = turbinia.__version__
-    self.requester = requester if requester else 'user_unspecified'
+    self.requester = requester or 'user_unspecified'
     self._evidence_config = {}
     self.recipe = {}
     self.task_config = {}
@@ -483,11 +479,7 @@ class TurbiniaTask:
     if config.TURBINIA_COMMAND in ('celeryworker', 'psqworker'):
       return True
 
-    for arg in sys.argv:
-      if 'nosetests' in arg:
-        return True
-
-    return False
+    return any('nosetests' in arg for arg in sys.argv)
 
   def evidence_setup(self, evidence):
     """Validates and processes the evidence.
@@ -581,24 +573,21 @@ class TurbiniaTask:
     # Avoid circular dependency.
     from turbinia.jobs import manager as job_manager
 
-    save_files = save_files if save_files else []
-    log_files = log_files if log_files else []
-    new_evidence = new_evidence if new_evidence else []
-    success_codes = success_codes if success_codes else [0]
+    save_files = save_files or []
+    log_files = log_files or []
+    new_evidence = new_evidence or []
+    success_codes = success_codes or [0]
     stdout = None
     stderr = None
 
     # Get timeout value.
     timeout_limit = job_manager.JobsManager.GetTimeoutValue(self.job_name)
 
-    # Execute the job via docker.
-    docker_image = job_manager.JobsManager.GetDockerImage(self.job_name)
-    if docker_image:
+    if docker_image := job_manager.JobsManager.GetDockerImage(self.job_name):
       ro_paths = []
       for path in ['local_path', 'source_path', 'device_path', 'mount_path']:
         if hasattr(result.input_evidence, path):
-          path_string = getattr(result.input_evidence, path)
-          if path_string:
+          if path_string := getattr(result.input_evidence, path):
             ro_paths.append(path_string)
       rw_paths = [self.output_dir, self.tmp_dir]
       container_manager = docker_manager.ContainerManager(docker_image)
@@ -606,18 +595,16 @@ class TurbiniaTask:
           cmd, shell, ro_paths=ro_paths, rw_paths=rw_paths,
           timeout_limit=timeout_limit)
 
-    # Execute the job on the host system.
     else:
       try:
         if shell:
           proc = subprocess.Popen(
               cmd, shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE,
               cwd=cwd)
-          proc.wait(timeout_limit)
         else:
           proc = subprocess.Popen(
               cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE, cwd=cwd)
-          proc.wait(timeout_limit)
+        proc.wait(timeout_limit)
       except subprocess.TimeoutExpired as exception:
         # Log error and close result.
         message = (

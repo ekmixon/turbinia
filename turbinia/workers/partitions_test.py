@@ -62,11 +62,10 @@ class PartitionEnumerationTaskTest(TestTurbiniaTaskBase):
     self.assertIsInstance(result, TurbiniaTaskResult)
     self.assertEqual(result.task_name, 'PartitionEnumerationTask')
     self.assertEqual(len(result.evidence), 1)
-    expected_report = []
-    expected_report.append(
-        fmt.heading4(
-            'Found 1 partition(s) in [{0:s}]:'.format(
-                self.evidence.local_path)))
+    expected_report = [
+        fmt.heading4('Found 1 partition(s) in [{0:s}]:'.format(
+            self.evidence.local_path))
+    ]
     expected_report.append(fmt.heading5('/p1:'))
     expected_report.append(fmt.bullet('Filesystem: NTFS'))
     expected_report.append(fmt.bullet('Partition index: 2'))
@@ -96,11 +95,10 @@ class PartitionEnumerationTaskTest(TestTurbiniaTaskBase):
     result = self.task.run(self.evidence, self.result)
 
     # Ensure run method returns a TurbiniaTaskResult instance.
-    expected_report = []
-    expected_report.append(
-        fmt.heading4(
-            'Found 1 partition(s) in [{0:s}]:'.format(
-                self.evidence.local_path)))
+    expected_report = [
+        fmt.heading4('Found 1 partition(s) in [{0:s}]:'.format(
+            self.evidence.local_path))
+    ]
     expected_report.append(fmt.heading5('/apfs1:'))
     expected_report.append(fmt.bullet('Filesystem: APFS_CONTAINER'))
     expected_report.append(fmt.bullet('Volume index: 0'))
@@ -131,11 +129,10 @@ class PartitionEnumerationTaskTest(TestTurbiniaTaskBase):
     result = self.task.run(self.evidence, self.result)
 
     # Ensure run method returns a TurbiniaTaskResult instance.
-    expected_report = []
-    expected_report.append(
-        fmt.heading4(
-            'Found 1 partition(s) in [{0:s}]:'.format(
-                self.evidence.local_path)))
+    expected_report = [
+        fmt.heading4('Found 1 partition(s) in [{0:s}]:'.format(
+            self.evidence.local_path))
+    ]
     expected_report.append(fmt.heading5('/p1:'))
     expected_report.append(fmt.bullet('Filesystem: EXT'))
     expected_report.append(fmt.bullet('Source evidence is a volume image'))
@@ -166,11 +163,10 @@ class PartitionEnumerationTaskTest(TestTurbiniaTaskBase):
     result = self.task.run(self.evidence, self.result)
 
     # Ensure run method returns a TurbiniaTaskResult instance.
-    expected_report = []
-    expected_report.append(
-        fmt.heading4(
-            'Found 1 partition(s) in [{0:s}]:'.format(
-                self.evidence.local_path)))
+    expected_report = [
+        fmt.heading4('Found 1 partition(s) in [{0:s}]:'.format(
+            self.evidence.local_path))
+    ]
     expected_report.append(fmt.heading5('/lvm1:'))
     expected_report.append(fmt.bullet('Filesystem: XFS'))
     expected_report.append(fmt.bullet('Source evidence is a volume image'))

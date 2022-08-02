@@ -180,15 +180,14 @@ def ValidateAndSetConfig(_config):
   for var in CONFIGVARS:
     empty_value = False
     if not hasattr(_config, var):
-      if var in OPTIONAL_VARS:
-        log.debug(
-            'Setting non-existent but optional config variable {0:s} to '
-            'None'.format(var))
-        empty_value = True
-      else:
+      if var not in OPTIONAL_VARS:
         raise TurbiniaException(
             'Required config attribute {0:s}:{1:s} not in config'.format(
                 _config.configSource, var))
+      log.debug(
+          'Setting non-existent but optional config variable {0:s} to '
+          'None'.format(var))
+      empty_value = True
     if var in REQUIRED_VARS and getattr(_config, var) is None:
       raise TurbiniaException(
           'Config attribute {0:s}:{1:s} is not set'.format(
@@ -214,9 +213,10 @@ def ParseDependencies():
   try:
     for values in CONFIG.DEPENDENCIES:
       job = values['job'].lower()
-      dependencies[job] = {}
-      dependencies[job]['programs'] = values['programs']
-      dependencies[job]['docker_image'] = values.get('docker_image')
+      dependencies[job] = {
+          'programs': values['programs'],
+          'docker_image': values.get('docker_image'),
+      }
       dependencies[job]['timeout'] = values.get('timeout')
   except (KeyError, TypeError) as exception:
     raise TurbiniaException(

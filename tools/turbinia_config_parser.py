@@ -36,15 +36,15 @@ CONFIGPATH = ['/etc/turbinia']
 def main():
   """Main function for config parser"""
   if len(sys.argv) < 2:
-    print('%s <key name>' % sys.argv[0])
+    print(f'{sys.argv[0]} <key name>')
     sys.exit(100)
-  key = sys.argv[1]
-  if key:
-    config_file = None
-    for dirname, filename in itertools.product(CONFIGPATH, CONFIGFILES):
-      if os.path.exists(os.path.join(dirname, filename)):
-        config_file = os.path.join(dirname, filename)
-        break
+  if key := sys.argv[1]:
+    config_file = next(
+        (os.path.join(dirname, filename)
+         for dirname, filename in itertools.product(CONFIGPATH, CONFIGFILES)
+         if os.path.exists(os.path.join(dirname, filename))),
+        None,
+    )
     if config_file is None:
       sys.exit(101)
     config = imp.load_source('config', config_file)
@@ -52,7 +52,7 @@ def main():
     try:
       print(getattr(config, key.upper()))
     except AttributeError:
-      print('Key not found: %s' % key)
+      print(f'Key not found: {key}')
       sys.exit(102)
 
 

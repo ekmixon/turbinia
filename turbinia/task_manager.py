@@ -221,14 +221,9 @@ class BaseTaskManager:
     # class of the output of the job itself.  Short term we could potentially
     # have a run time check for this upon Job instantiation to prevent it.
     for job in jobs_list:
-      # Doing a strict type check here for now until we can get the above
-      # comment figured out.
-      # pylint: disable=unidiomatic-typecheck
-      job_applicable = [
+      if job_applicable := [
           True for t in job.evidence_input if type(evidence_) == t
-      ]
-
-      if job_applicable:
+      ]:
         job_instance = job(
             request_id=evidence_.request_id, evidence_config=evidence_.config)
 
@@ -266,11 +261,10 @@ class BaseTaskManager:
     Returns:
       bool: Indicating whether all Jobs are done.
     """
-    job_completion = []
-    for job in self.running_jobs:
-      if request_id == job.request_id:
-        job_completion.append(job.check_done())
-
+    job_completion = [
+        job.check_done() for job in self.running_jobs
+        if request_id == job.request_id
+    ]
     return min(job_completion)
 
   def check_request_finalized(self, request_id):
@@ -288,12 +282,8 @@ class BaseTaskManager:
     Returns:
       bool: Indicating whether all Jobs are done.
     """
-    request_finalized = False
-    for job in self.running_jobs:
-      if request_id == job.request_id and job.is_finalized:
-        request_finalized = True
-        break
-
+    request_finalized = any(request_id == job.request_id and job.is_finalized
+                            for job in self.running_jobs)
     return request_finalized and self.check_request_done(request_id)
 
   def get_evidence(self):
@@ -313,13 +303,11 @@ class BaseTaskManager:
     Returns:
       TurbiniaJob|None: Job instance if found, else None
     """
-    job = None
-    for job_instance in self.running_jobs:
-      if job_id == job_instance.id:
-        job = job_instance
-        break
-
-    return job
+    return next(
+        (job_instance
+         for job_instance in self.running_jobs if job_id == job_instance.id),
+        None,
+    )
 
   def generate_request_finalize_tasks(self, job):
     """Generates the Tasks to finalize the given request ID.
@@ -399,12 +387,7 @@ class BaseTaskManager:
     Returns:
       bool: True if Job removed, else False.
     """
-    remove_job = None
-    for job in self.running_jobs:
-      if job_id == job.id:
-        remove_job = job
-        break
-
+    remove_job = next((job for job in self.running_jobs if job_id == job.id), None)
     if remove_job:
       self.running_jobs.remove(remove_job)
       turbinia_jobs_completed_total.inc()
@@ -493,28 +476,27 @@ class BaseTaskManager:
     self.state_manager.update_task(task)
     job.remove_task(task.id)
     turbinia_server_tasks_completed_total.inc()
-    if job.check_done() and not (job.is_finalize_job or task.is_finalize_task):
-      log.debug(
-          'Job {0:s} completed, creating Job finalize tasks'.format(job.name))
-      final_task = job.create_final_task()
-      if final_task:
-        final_task.is_finalize_task = True
-        self.add_task(final_task, job, job.evidence)
-        turbinia_server_tasks_total.inc()
-    elif job.check_done() and job.is_finalize_job:
-      job.is_finalized = True
+    if job.check_done():
+      if not ((job.is_finalize_job or task.is_finalize_task)):
+        log.debug(
+            'Job {0:s} completed, creating Job finalize tasks'.format(job.name))
+        if final_task := job.create_final_task():
+          final_task.is_finalize_task = True
+          self.add_task(final_task, job, job.evidence)
+          turbinia_server_tasks_total.inc()
+      elif job.is_finalize_job:
+        job.is_finalized = True
 
     request_id = job.request_id
     request_done = self.check_request_done(request_id)
     request_finalized = self.check_request_finalized(request_id)
     # If the request is done but not finalized, we generate the finalize tasks.
-    if request_done and not request_finalized:
-      self.generate_request_finalize_tasks(job)
+    if request_done:
+      if not request_finalized:
+        self.generate_request_finalize_tasks(job)
 
-    # If the Job has been finalized then we can remove all the Jobs for this
-    # request since everything is complete.
-    elif request_done and request_finalized:
-      self.remove_jobs(request_id)
+      else:
+        self.remove_jobs(request_id)
 
   def process_tasks(self):
     """Process any tasks that need to be processed.
@@ -533,8 +515,7 @@ class BaseTaskManager:
 
       for task in self.process_tasks():
         if task.result:
-          job = self.process_result(task.result)
-          if job:
+          if job := self.process_result(task.result):
             self.process_job(job, task)
         self.state_manager.update_task(task)
 

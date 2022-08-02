@@ -47,8 +47,7 @@ class JenkinsAnalysisJob(interface.TurbiniaJob):
     Returns:
         A list of tasks to schedule.
     """
-    tasks = [JenkinsAnalysisTask() for _ in evidence]
-    return tasks
+    return [JenkinsAnalysisTask() for _ in evidence]
 
 
 manager.JobsManager.RegisterJob(JenkinsAnalysisJob)

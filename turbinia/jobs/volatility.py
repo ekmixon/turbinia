@@ -47,8 +47,7 @@ class VolatilityJob(interface.TurbiniaJob):
 
     tasks = []
     for evidence_item in evidence:
-      for mod in evidence_item.module_list:
-        tasks.append(VolatilityTask(mod))
+      tasks.extend(VolatilityTask(mod) for mod in evidence_item.module_list)
     return tasks
 
 

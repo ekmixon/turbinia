@@ -48,11 +48,10 @@ class JupyterExtractionJob(interface.TurbiniaJob):
     Returns:
         A list of tasks to schedule.
     """
-    tasks = [
+    return [
         artifact.FileArtifactExtractionTask('JupyterConfigFile')
         for _ in evidence
     ]
-    return tasks
 
 
 class JupyterAnalysisJob(interface.TurbiniaJob):
@@ -72,11 +71,10 @@ class JupyterAnalysisJob(interface.TurbiniaJob):
     Returns:
         A list of tasks to schedule.
     """
-    tasks = []
-    for evidence_item in evidence:
-      if evidence_item.artifact_name == 'JupyterConfigFile':
-        tasks.append(JupyterAnalysisTask())
-    return tasks
+    return [
+        JupyterAnalysisTask() for evidence_item in evidence
+        if evidence_item.artifact_name == 'JupyterConfigFile'
+    ]
 
 
 manager.JobsManager.RegisterJobs([JupyterExtractionJob, JupyterAnalysisJob])

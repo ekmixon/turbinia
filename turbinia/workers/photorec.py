@@ -50,8 +50,7 @@ class PhotorecTask(TurbiniaTask):
       # Generate the command we want to run.
       cmd = ['photorec', '/log', '/d', output_file_path, '/cmd']
       if evidence.device_path:
-        sudo = ['sudo']
-        sudo.extend(cmd)
+        sudo = ['sudo', *cmd]
         cmd = sudo
         cmd.append(evidence.device_path)
       else:

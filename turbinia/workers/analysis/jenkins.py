@@ -70,12 +70,11 @@ class JenkinsAnalysisTask(TurbiniaTask):
       result.close(self, success=False, status=str(e))
       return result
 
-    jenkins_artifacts = []
     jenkins_re = re.compile(r'^.*jenkins[^\/]*(\/users\/[^\/]+)*\/config\.xml$')
-    for collected_artifact in collected_artifacts:
-      if re.match(jenkins_re, collected_artifact):
-        jenkins_artifacts.append(collected_artifact)
-
+    jenkins_artifacts = [
+        collected_artifact for collected_artifact in collected_artifacts
+        if re.match(jenkins_re, collected_artifact)
+    ]
     version = None
     credentials = []
     for filepath in jenkins_artifacts:
@@ -118,14 +117,9 @@ class JenkinsAnalysisTask(TurbiniaTask):
     Returns:
       str: The version of Jenkins.
     """
-    version = None
     version_re = re.compile('<version>(.*)</version>')
-    version_match = re.search(version_re, config)
-
-    if version_match:
-      version = version_match.group(1)
-
-    return version
+    return (version_match[1] if
+            (version_match := re.search(version_re, config)) else None)
 
   @staticmethod
   def _extract_jenkins_credentials(config):
@@ -145,8 +139,8 @@ class JenkinsAnalysisTask(TurbiniaTask):
     username_match = re.search(username_re, config)
 
     if username_match and password_hash_match:
-      username = username_match.group(1)
-      password_hash = password_hash_match.group(1)
+      username = username_match[1]
+      password_hash = password_hash_match[1]
       credentials.append((username, password_hash))
 
     return credentials
@@ -167,7 +161,6 @@ class JenkinsAnalysisTask(TurbiniaTask):
         summary(str): A summary of the report (used for task status)
       )
     """
-    report = []
     summary = ''
     priority = Priority.LOW
     credentials_registry = {hash: username for username, hash in credentials}
@@ -179,8 +172,7 @@ class JenkinsAnalysisTask(TurbiniaTask):
 
     if not version:
       version = 'Unknown'
-    report.append(fmt.bullet('Jenkins version: {0:s}'.format(version)))
-
+    report = [fmt.bullet('Jenkins version: {0:s}'.format(version))]
     if weak_passwords:
       priority = Priority.CRITICAL
       summary = 'Jenkins analysis found potential issues'

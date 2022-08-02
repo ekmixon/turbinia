@@ -42,8 +42,7 @@ class LokiAnalysisJob(interface.TurbiniaJob):
     Returns:
         A list of tasks to schedule.
     """
-    tasks = [loki.LokiAnalysisTask() for _ in evidence]
-    return tasks
+    return [loki.LokiAnalysisTask() for _ in evidence]
 
 
 manager.JobsManager.RegisterJob(LokiAnalysisJob)

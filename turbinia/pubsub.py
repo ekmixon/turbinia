@@ -114,8 +114,7 @@ class TurbiniaPubSub(TurbiniaMessageBase):
       data = message.data
       log.info('Processing PubSub message {0:s}'.format(message.message_id))
 
-      request = self._validate_message(data)
-      if request:
+      if request := self._validate_message(data):
         requests.append(request)
       else:
         log.error('Error processing PubSub message: {0:s}'.format(data))

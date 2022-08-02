@@ -182,8 +182,8 @@ def bruteforce_password_hashes(
 
   cmd = ['hashcat', '--force', '-a', '0']
   if extra_args:
-    cmd = cmd + extra_args.split(' ')
-  cmd = cmd + ['--potfile-path={}'.format(pot_file)]
+    cmd += extra_args.split(' ')
+  cmd = cmd + [f'--potfile-path={pot_file}']
   cmd = cmd + [password_hashes_file_path, password_list_file_path]
 
   with open(os.devnull, 'w') as devnull:
@@ -204,8 +204,7 @@ def bruteforce_password_hashes(
     with open(pot_file, 'r') as fh:
       for line in fh:
         password_hash, plaintext = line.rsplit(':', 1)
-        plaintext = plaintext.rstrip()
-        if plaintext:
+        if plaintext := plaintext.rstrip():
           result.append((password_hash, plaintext))
     os.remove(pot_file)
 

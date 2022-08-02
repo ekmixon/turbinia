@@ -43,9 +43,9 @@ class JobsManager:
     Raises:
       TurbiniaException if both jobs_denylist and jobs_allowlist are specified.
     """
-    jobs_denylist = jobs_denylist if jobs_denylist else []
+    jobs_denylist = jobs_denylist or []
     jobs_denylist = [job.lower() for job in jobs_denylist]
-    jobs_allowlist = jobs_allowlist if jobs_allowlist else []
+    jobs_allowlist = jobs_allowlist or []
     jobs_allowlist = [job.lower() for job in jobs_allowlist]
 
     if jobs_allowlist and jobs_denylist:
@@ -162,12 +162,10 @@ class JobsManager:
     Returns:
       list[BaseJob]: job instances.
     """
-    job_instances = []
-    for job_name, job_class in iter(cls.GetJobs()):
-      if job_name in job_names:
-        job_instances.append(job_class())
-
-    return job_instances
+    return [
+        job_class() for job_name, job_class in iter(cls.GetJobs())
+        if job_name in job_names
+    ]
 
   @classmethod
   def GetJobNames(cls):
@@ -192,10 +190,7 @@ class JobsManager:
         type: the job class.
     """
     for job_name, job_class in iter(cls._job_classes.items()):
-      if job_names:
-        if job_name in job_names:
-          yield job_name, job_class
-      else:
+      if job_names and job_name in job_names or not job_names:
         yield job_name, job_class
 
   @classmethod

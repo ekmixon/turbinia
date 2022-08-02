@@ -195,19 +195,18 @@ class ContainerManager(DockerManager):
     device_paths = []
     file_paths = {}
 
-    if mode in accepted_vars:
-      for mpath in mount_paths:
-        device_mpath = '{0:s}:{0:s}:{1:s}'.format(str(mpath), 'r')
-        if mpath not in file_paths.keys() and device_mpath not in device_paths:
-          if IsBlockDevice(mpath):
-            device_paths.append(device_mpath)
-          else:
-            file_paths[mpath] = {'bind': mpath, 'mode': mode}
-    else:
+    if mode not in accepted_vars:
       raise TurbiniaException(
           'An incorrect mode was passed: {0:s}. Unable to create the correct '
           'mount points for the Docker container.'.format(mode))
 
+    for mpath in mount_paths:
+      device_mpath = '{0:s}:{0:s}:{1:s}'.format(str(mpath), 'r')
+      if mpath not in file_paths.keys() and device_mpath not in device_paths:
+        if IsBlockDevice(mpath):
+          device_paths.append(device_mpath)
+        else:
+          file_paths[mpath] = {'bind': mpath, 'mode': mode}
     return device_paths, file_paths
 
   def execute_container(
@@ -234,32 +233,26 @@ class ContainerManager(DockerManager):
       TurbiniaException: If an error occurred with the Docker container.
     """
     container = None
-    args = {}
     stdout = ''
 
     # Override the entrypoint to /bin/sh
     kwargs['entrypoint'] = '/bin/sh'
-    if shell:
-      cmd = '-c ' + '\"{0:s}\"'.format(cmd)
-    else:
+    if not shell:
       cmd = ' '.join(cmd)
-      cmd = '-c ' + '\"{0:s}\"'.format(cmd)
-
+    cmd = '-c ' + '\"{0:s}\"'.format(cmd)
     # Create the device and file mount paths
     device_paths = []
     file_paths = {}
     if rw_paths:
       dwpath, fwpath = self._create_mount_points(rw_paths)
       device_paths.extend(dwpath)
-      file_paths.update(fwpath)
+      file_paths |= fwpath
     if ro_paths:
       drpath, frpath = self._create_mount_points(ro_paths, mode='ro')
       device_paths.extend(drpath)
       file_paths.update(frpath)
 
-    args['devices'] = device_paths
-    args['volumes'] = file_paths
-
+    args = {'devices': device_paths, 'volumes': file_paths}
     # Add any additional arguments
     for key, value in kwargs.items():
       args[key] = value

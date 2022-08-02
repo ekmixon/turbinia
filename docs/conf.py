@@ -95,7 +95,7 @@ class ProcessLink(transforms.Transform):
     if isinstance(node, nodes.reference) and 'refuri' in node:
       r = node['refuri']
       if r.endswith('.md'):
-        r = r[:-3] + '.html'
+        r = f'{r[:-3]}.html'
         node['refuri'] = r
 
     return node

@@ -82,7 +82,7 @@ def check_docker_dependencies(dependencies):
     docker_image = values.get('docker_image')
     # short id only pulls the first 10 characters of image id.
     if docker_image and len(docker_image) > 10:
-      docker_image = docker_image[0:10]
+      docker_image = docker_image[:10]
 
     if docker_image in images:
       for program in values['programs']:

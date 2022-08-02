@@ -97,8 +97,7 @@ class TurbiniaKombu(TurbiniaMessageBase):
     while True:
       try:
         message = self.queue.get(block=False)
-        request = self._validate_message(message.payload)
-        if request:
+        if request := self._validate_message(message.payload):
           requests.append(request)
           if self.queue.queue.durable:
             message.ack()

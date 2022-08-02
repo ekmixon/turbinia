@@ -46,8 +46,7 @@ class BinaryExtractorJob(interface.TurbiniaJob):
     Returns:
         A list of tasks to schedule.
     """
-    tasks = [BinaryExtractorTask() for _ in evidence]
-    return tasks
+    return [BinaryExtractorTask() for _ in evidence]
 
 
 manager.JobsManager.RegisterJob(BinaryExtractorJob)

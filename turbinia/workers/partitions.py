@@ -50,8 +50,6 @@ class PartitionEnumerationTask(TurbiniaTask):
       A new RawDiskPartition evidence item and a list of strings containing
       partition information to add to the status report.
     """
-    status_report = []
-
     fs_path_spec = path_spec
     fs_location = None
     partition_location = None
@@ -107,19 +105,19 @@ class PartitionEnumerationTask(TurbiniaTask):
 
       path_spec = path_spec.parent
 
-    status_report.append(fmt.heading5('{0!s}:'.format(fs_location)))
-    status_report.append(
-        fmt.bullet('Filesystem: {0!s}'.format(fs_path_spec.type_indicator)))
+    status_report = [
+        fmt.heading5('{0!s}:'.format(fs_location)),
+        fmt.bullet('Filesystem: {0!s}'.format(fs_path_spec.type_indicator)),
+    ]
     if volume_index is not None:
       status_report.append(
           fmt.bullet('Volume index: {0!s}'.format(volume_index)))
     if partition_index is not None:
-      status_report.append(
-          fmt.bullet('Partition index: {0!s}'.format(partition_index)))
-      status_report.append(
-          fmt.bullet('Partition offset: {0!s}'.format(partition_offset)))
-      status_report.append(
-          fmt.bullet('Partition size: {0!s}'.format(partition_size)))
+      status_report.extend((
+          fmt.bullet('Partition index: {0!s}'.format(partition_index)),
+          fmt.bullet('Partition offset: {0!s}'.format(partition_offset)),
+          fmt.bullet('Partition size: {0!s}'.format(partition_size)),
+      ))
     if volume_index is None and partition_index is None:
       status_report.append(fmt.bullet('Source evidence is a volume image'))
 

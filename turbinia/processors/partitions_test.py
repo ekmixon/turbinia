@@ -35,8 +35,7 @@ class PartitionsProcessorTest(unittest.TestCase):
       String containing the full path to the test data.
     """
     filedir = os.path.dirname(os.path.realpath(__file__))
-    test_path = os.path.join(filedir, '..', '..', 'test_data', filename)
-    return test_path
+    return os.path.join(filedir, '..', '..', 'test_data', filename)
 
   def testEnumerateOnAPFS(self):
     """Test Enumerate on APFS."""

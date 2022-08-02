@@ -41,8 +41,7 @@ class HindsightJob(interface.TurbiniaJob):
             A list of tasks to schedule.
         """
 
-    tasks = [HindsightTask() for _ in evidence]
-    return tasks
+    return [HindsightTask() for _ in evidence]
 
 
 manager.JobsManager.RegisterJob(HindsightJob)

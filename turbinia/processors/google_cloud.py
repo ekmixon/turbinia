@@ -134,11 +134,7 @@ def PostprocessDetachDisk(disk_name, local_path):
     local_path(str): The local path to the block device to detach.
   """
   #TODO: can local_path be something different than the /dev/disk/by-id/google*
-  if local_path:
-    path = local_path
-  else:
-    path = '/dev/disk/by-id/google-{0:s}'.format(disk_name)
-
+  path = local_path or '/dev/disk/by-id/google-{0:s}'.format(disk_name)
   if not IsBlockDevice(path):
     log.info('Disk {0:s} already detached!'.format(disk_name))
     return

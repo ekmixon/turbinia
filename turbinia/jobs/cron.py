@@ -50,11 +50,10 @@ class CronExtractionJob(interface.TurbiniaJob):
     Returns:
         A list of tasks to schedule.
     """
-    tasks = [
+    return [
         artifact.FileArtifactExtractionTask('LinuxScheduleFiles')
         for _ in evidence
     ]
-    return tasks
 
 
 class CronAnalysisJob(interface.TurbiniaJob):
@@ -74,11 +73,10 @@ class CronAnalysisJob(interface.TurbiniaJob):
     Returns:
         A list of tasks to schedule.
     """
-    tasks = []
-    for evidence_item in evidence:
-      if evidence_item.artifact_name == 'LinuxScheduleFiles':
-        tasks.append(cron.CronAnalysisTask())
-    return tasks
+    return [
+        cron.CronAnalysisTask() for evidence_item in evidence
+        if evidence_item.artifact_name == 'LinuxScheduleFiles'
+    ]
 
 
 manager.JobsManager.RegisterJobs([CronAnalysisJob, CronExtractionJob])

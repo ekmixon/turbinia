@@ -56,11 +56,10 @@ def load_recipe_from_file(recipe_file, validate=True):
     with open(recipe_file, 'r') as r_file:
       recipe_file_contents = r_file.read()
       recipe_dict = load(recipe_file_contents, Loader=Loader)
-      if validate:
-        success, _ = validate_recipe(recipe_dict)
-        if success:
-          return recipe_dict
-      else:
+      if not validate:
+        return recipe_dict
+      success, _ = validate_recipe(recipe_dict)
+      if success:
         return recipe_dict
   except yaml.parser.ParserError as exception:
     message = (
@@ -97,8 +96,7 @@ def validate_globals_recipe(proposed_globals_recipe):
         filter_patterns_file)
   if yara_rules_file:
     proposed_globals_recipe['yara_rules'] = file_to_str(yara_rules_file)
-  diff = set(proposed_globals_recipe) - set(DEFAULT_GLOBALS_RECIPE)
-  if diff:
+  if diff := set(proposed_globals_recipe) - set(DEFAULT_GLOBALS_RECIPE):
     message = (
         'Invalid recipe: Unknown keys [{0:s}] found in globals recipe'.format(
             str(diff)))

@@ -53,7 +53,7 @@ class TurbiniaJob:
     self.completed_task_count = 0
     self.evidence = EvidenceCollection()
     self.evidence.request_id = request_id
-    self.evidence.config = evidence_config if evidence_config else {}
+    self.evidence.config = evidence_config or {}
     self.timeout = None
 
   def check_done(self):
@@ -62,10 +62,7 @@ class TurbiniaJob:
     Returns:
       bool: True if all Tasks have completed, else False.
     """
-    if self.completed_task_count and not self.tasks:
-      return True
-    else:
-      return False
+    return bool(self.completed_task_count and not self.tasks)
 
   def create_tasks(self, evidence):
     """Create Turbinia tasks to be run.
@@ -102,12 +99,7 @@ class TurbiniaJob:
     Returns:
       bool: True for success, else False.
     """
-    remove_task = None
-    for task in self.tasks:
-      if task_id == task.id:
-        remove_task = task
-        break
-
+    remove_task = next((task for task in self.tasks if task_id == task.id), None)
     if remove_task:
       self.tasks.remove(remove_task)
       log.debug('Removed task {0:s} from Job {1:s}'.format(task_id, self.name))

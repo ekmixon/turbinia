@@ -63,8 +63,7 @@ class DfdeweyTask(TurbiniaTask):
     status_summary = ''
 
     if self.task_config.get('case'):
-      cmd = ['dfdewey']
-      cmd.append(self.task_config.get('case'))
+      cmd = ['dfdewey', self.task_config.get('case')]
       if self.task_config.get('search'):
         cmd.extend(['-s', self.task_config.get('search')])
       else:

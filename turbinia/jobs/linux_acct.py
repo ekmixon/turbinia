@@ -44,8 +44,7 @@ class LinuxAccountAnalysisJob(interface.TurbiniaJob):
     Returns:
         A list of tasks to schedule.
     """
-    tasks = [linux_acct.LinuxAccountAnalysisTask() for _ in evidence]
-    return tasks
+    return [linux_acct.LinuxAccountAnalysisTask() for _ in evidence]
 
 
 manager.JobsManager.RegisterJob(LinuxAccountAnalysisJob)

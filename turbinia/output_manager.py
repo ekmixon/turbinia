@@ -259,10 +259,7 @@ class OutputWriter:
       config.LoadConfig()
       self.base_output_dir = config.OUTPUT_DIR
 
-    if local_output_dir:
-      self.local_output_dir = local_output_dir
-    else:
-      self.local_output_dir = self.create_output_dir()
+    self.local_output_dir = local_output_dir or self.create_output_dir()
 
   def create_output_dir(self, base_path=None):
     """Creates a unique output path for this task and creates directories.
@@ -333,7 +330,7 @@ class LocalOutputWriter(OutputWriter):
     self.tmp_dir = self.create_output_dir(base_path=config.TMP_DIR)
 
   def create_output_dir(self, base_path=None):
-    base_path = base_path if base_path else self.base_output_dir
+    base_path = base_path or self.base_output_dir
     output_dir = os.path.join(base_path, self.unique_dir)
     if not os.path.exists(output_dir):
       try:
@@ -420,11 +417,11 @@ class GCSOutputWriter(OutputWriter):
     Returns:
       A tuple of ((string) bucket, (string) path)
     """
-    match = re.search(r'gs://(.*?)/(.*$)', file_)
-    if not match:
+    if match := re.search(r'gs://(.*?)/(.*$)', file_):
+      return match[1], match[2]
+    else:
       raise TurbiniaException(
           'Cannot find bucket and path from GCS config {0:s}'.format(file_))
-    return match.group(1), match.group(2)
 
   def create_output_dir(self, base_path=None):
     # Directories in GCS are artificial, so any path can be written as part of
@@ -516,7 +513,7 @@ class GCSOutputWriter(OutputWriter):
         try:
           # Reconstruct the same file structure as GCS on the output dir
           path_split = gcs_path.split('/')
-          directory = os.path.join(*path_split[0:-1])
+          directory = os.path.join(*path_split[:-1])
           destination_path = os.path.join(self.local_output_dir, directory)
           Path(destination_path).mkdir(parents=True, exist_ok=True)
           if not os.path.exists(destination_path):

@@ -46,7 +46,7 @@ class MockPubSubMessage:
   """This is a mock of a PubSub message."""
 
   def __init__(self, data='fake data', message_id='12345'):
-    self.data = data if data else ''
+    self.data = data or ''
     self.message_id = message_id
 
 

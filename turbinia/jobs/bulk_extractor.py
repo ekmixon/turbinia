@@ -47,9 +47,7 @@ class BulkExtractorJob(interface.TurbiniaJob):
     Returns:
         A list of tasks to schedule.
     """
-    # Generate tasks for Bulk Extractor job
-    tasks = [BulkExtractorTask() for _ in evidence]
-    return tasks
+    return [BulkExtractorTask() for _ in evidence]
 
 
 manager.JobsManager.RegisterJob(BulkExtractorJob)

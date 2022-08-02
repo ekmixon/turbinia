@@ -81,10 +81,7 @@ def evidence_decode(evidence_dict):
 
   # We can just reinitialize instead of deserializing because the state should
   # be empty when just starting to process on a new machine.
-  evidence.state = {}
-  for state in EvidenceState:
-    evidence.state[state] = False
-
+  evidence.state = {state: False for state in EvidenceState}
   return evidence
 
 
@@ -179,7 +176,7 @@ class Evidence:
     self.credentials = []
     self.source = source
     self.source_path = source_path
-    self.tags = tags if tags else {}
+    self.tags = tags or {}
     self.request_id = request_id
     self.has_child_evidence = False
     self.parent_evidence = None
@@ -192,14 +189,11 @@ class Evidence:
     # List of jobs that have processed this evidence
     self.processed_by = []
     self.type = self.__class__.__name__
-    self.name = name if name else self.type
+    self.name = name or self.type
     self.saved_path = None
     self.saved_path_type = None
 
-    self.state = {}
-    for state in EvidenceState:
-      self.state[state] = False
-
+    self.state = {state: False for state in EvidenceState}
     if self.copyable and not self.local_path:
       raise TurbiniaException(
           '{0:s} is a copyable evidence and needs a source_path'.format(
@@ -404,9 +398,10 @@ class Evidence:
     Returns:
       str:  The state as a formatted string
     """
-    output = []
-    for state, value in self.state.items():
-      output.append('{0:s}: {1!s}'.format(state.name, value))
+    output = [
+        '{0:s}: {1!s}'.format(state.name, value)
+        for state, value in self.state.items()
+    ]
     return '[{0:s}]'.format(', '.join(output))
 
   def validate(self):
@@ -440,7 +435,7 @@ class EvidenceCollection(Evidence):
   def __init__(self, collection=None, *args, **kwargs):
     """Initialization for Evidence Collection object."""
     super(EvidenceCollection, self).__init__(*args, **kwargs)
-    self.collection = collection if collection else []
+    self.collection = collection or []
 
   def serialize(self):
     """Return JSON serializable object."""
@@ -648,10 +643,10 @@ class DiskPartition(RawDisk):
         # bdemount creates a virtual device named bde1 in the mount path. This
         # needs to be unmounted rather than detached.
         mount_local.PostprocessUnmountPath(self.device_path.replace('bde1', ''))
-        self.state[EvidenceState.ATTACHED] = False
       else:
         mount_local.PostprocessDeleteLosetup(self.device_path, self.lv_uuid)
-        self.state[EvidenceState.ATTACHED] = False
+
+      self.state[EvidenceState.ATTACHED] = False
 
 
 class GoogleCloudDisk(RawDisk):

@@ -82,8 +82,7 @@ class WordpressAccessLogAnalysisTask(TurbiniaTask):
 
   def _get_timestamp(self, log_line):
     """Extracts a timestamp from an access log line."""
-    match = self.timestamp_regex.search(log_line)
-    if match:
+    if match := self.timestamp_regex.search(log_line):
       return match.group('timestamp')
     return '[N/A]'
 
@@ -111,8 +110,7 @@ class WordpressAccessLogAnalysisTask(TurbiniaTask):
         report.append(fmt.bullet(line))
         findings_summary.add('install')
 
-      match = self.theme_editor_regex.search(log_line)
-      if match:
+      if match := self.theme_editor_regex.search(log_line):
         line = '{0:s}: Wordpress theme editor edited file ({1:s})'.format(
             self._get_timestamp(log_line), match.group('edited_file'))
         report.append(fmt.bullet(line))

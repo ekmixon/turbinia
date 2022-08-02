@@ -14,6 +14,7 @@
 # limitations under the License.
 """Turbinia Config Template"""
 
+
 from __future__ import unicode_literals
 
 ################################################################################
@@ -46,10 +47,10 @@ OUTPUT_DIR = '/var/tmp'
 TMP_DIR = '/tmp'
 
 # File to log debugging output to.
-LOG_FILE = '%s/turbinia.log' % TMP_DIR
+LOG_FILE = f'{TMP_DIR}/turbinia.log'
 
 # Path to a lock file used for the worker tasks.
-LOCK_FILE = '%s/turbinia-worker.lock' % TMP_DIR
+LOCK_FILE = f'{TMP_DIR}/turbinia-worker.lock'
 
 # This folder is used to maintain the RESOURCE_FILE needed for resource tracking across
 # multiple workers on a given host. It is important that this folder is shared amongst
@@ -61,15 +62,15 @@ TMP_RESOURCE_DIR = '/var/run/lock'
 # If for example, you are running the workers within containers, be sure to map the
 # OUTPUT_DIR from the container to the host so that the workers are updating a single
 # resource file rather than individual state files within the containers.
-RESOURCE_FILE = '%s/turbinia-state.json' % TMP_RESOURCE_DIR
+RESOURCE_FILE = f'{TMP_RESOURCE_DIR}/turbinia-state.json'
 
 # Path to a resource state lock file used for locking changes to shared Evidence types.
 # Similar to RESOURCE_FILE, this should be a shared path amongst all workers on a given
 # host to properly lock the resource state file.
-RESOURCE_FILE_LOCK = '%s.lock' % RESOURCE_FILE
+RESOURCE_FILE_LOCK = f'{RESOURCE_FILE}.lock'
 
 # For Kubernetes infrastructure. Indicates whether a given pod is set to be deleted.
-SCALEDOWN_WORKER_FILE = '%s/turbinia-to-scaledown.lock' % TMP_DIR
+SCALEDOWN_WORKER_FILE = f'{TMP_DIR}/turbinia-to-scaledown.lock'
 
 # Time in seconds to sleep in task management loops
 SLEEP_TIME = 10
@@ -274,7 +275,7 @@ CELERY_BACKEND = 'redis://localhost'
 KOMBU_BROKER = CELERY_BROKER
 
 # Used to namespace communications.
-KOMBU_CHANNEL = '%s-kombu' % INSTANCE_ID
+KOMBU_CHANNEL = f'{INSTANCE_ID}-kombu'
 
 # Will messages be persistent and require acknowledgment?
 # http://docs.celeryproject.org/projects/kombu/en/4.0/reference/kombu.html#kombu.Connection.SimpleBuffer

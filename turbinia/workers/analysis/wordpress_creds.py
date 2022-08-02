@@ -156,7 +156,7 @@ class WordpressCredsAnalysisTask(TurbiniaTask):
           m = re.match(_CREDS_REGEXP, cred)
           if not m:
             continue
-          (username, passwdhash) = (m.group('username'), m.group('password'))
+          (username, passwdhash) = m['username'], m['password']
           creds.append('{0:s}:{1:s}'.format(username, passwdhash))
           hashnames[passwdhash] = username
     return (creds, hashnames)
@@ -180,12 +180,12 @@ class WordpressCredsAnalysisTask(TurbiniaTask):
     summary = 'No weak passwords found'
     priority = Priority.LOW
 
-    # 1000 is "phpass"
-    weak_passwords = bruteforce_password_hashes(
-        creds, tmp_dir=self.tmp_dir, timeout=timeout,
-        extra_args='--username -m 400')
-
-    if weak_passwords:
+    if weak_passwords := bruteforce_password_hashes(
+        creds,
+        tmp_dir=self.tmp_dir,
+        timeout=timeout,
+        extra_args='--username -m 400',
+    ):
       priority = Priority.CRITICAL
       summary = 'Wordpress analysis found {0:d} weak password(s)'.format(
           len(weak_passwords))

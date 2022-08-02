@@ -45,8 +45,7 @@ class WindowsAccountAnalysisJob(interface.TurbiniaJob):
     Returns:
         A list of tasks to schedule.
     """
-    tasks = [windows_acct.WindowsAccountAnalysisTask() for _ in evidence]
-    return tasks
+    return [windows_acct.WindowsAccountAnalysisTask() for _ in evidence]
 
 
 manager.JobsManager.RegisterJob(WindowsAccountAnalysisJob)

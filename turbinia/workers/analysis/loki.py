@@ -95,18 +95,14 @@ class LokiAnalysisTask(TurbiniaTask):
     with open(stdout_file, 'r') as loki_report_csv:
       lokireader = csv.DictReader(
           loki_report_csv, fieldnames=['Time', 'Hostname', 'Level', 'Log'])
-      for row in lokireader:
-        if row['Level'] == 'ALERT':
-          report_lines.append(row['Log'])
-
+      report_lines.extend(
+          row['Log'] for row in lokireader if row['Level'] == 'ALERT')
     if report_lines:
       priority = Priority.HIGH
       summary = 'Loki analysis found {0:d} alert(s)'.format(len(report_lines))
       report.insert(0, fmt.heading4(fmt.bold(summary)))
       line = '{0:n} alerts(s) found:'.format(len(report_lines))
       report.append(fmt.bullet(fmt.bold(line)))
-      for line in report_lines:
-        report.append(fmt.bullet(line, level=2))
-
+      report.extend(fmt.bullet(line, level=2) for line in report_lines)
     report = '\n'.join(report)
     return (report, priority, summary)

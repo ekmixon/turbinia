@@ -70,7 +70,7 @@ def CompressDirectory(uncompressed_directory, output_path=None):
             uncompressed_directory))
 
   # Iterate through a given list of files and compress them.
-  compressed_directory = uncompressed_directory + '.tar.gz'
+  compressed_directory = f'{uncompressed_directory}.tar.gz'
   if output_path:
     output_file = compressed_directory.split('/')[-1]
     compressed_directory = os.path.join(output_path, output_file)
@@ -104,7 +104,7 @@ def UncompressTarFile(compressed_directory, output_tmp):
   ValidateTarFile(compressed_directory)
 
   # Generate the uncompressed directory path
-  uncompressed_file = 'uncompressed-' + str(int(time()))
+  uncompressed_file = f'uncompressed-{int(time())}'
   uncompressed_directory = os.path.join(output_tmp, uncompressed_file)
 
   # Uncompress the tar file into the uncompressed directory.

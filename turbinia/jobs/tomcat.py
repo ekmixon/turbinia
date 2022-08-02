@@ -48,10 +48,7 @@ class TomcatExtractionJob(interface.TurbiniaJob):
      Returns:
         A list of tasks to schedule.
     """
-    tasks = [
-        artifact.FileArtifactExtractionTask('TomcatFiles') for _ in evidence
-    ]
-    return tasks
+    return [artifact.FileArtifactExtractionTask('TomcatFiles') for _ in evidence]
 
 
 class TomcatAnalysisJob(interface.TurbiniaJob):
@@ -71,12 +68,10 @@ class TomcatAnalysisJob(interface.TurbiniaJob):
      Returns:
         A list of tasks to schedule.
     """
-    tasks = []
-
-    for evidence_item in evidence:
-      if evidence_item.artifact_name == 'TomcatFile':
-        tasks.append(tomcat.TomcatAnalysisTask())
-    return tasks
+    return [
+        tomcat.TomcatAnalysisTask() for evidence_item in evidence
+        if evidence_item.artifact_name == 'TomcatFile'
+    ]
 
 
 manager.JobsManager.RegisterJobs([TomcatExtractionJob, TomcatAnalysisJob])

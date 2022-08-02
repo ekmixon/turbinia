@@ -63,7 +63,7 @@ def sendmail(address, subject, message):
             'attempting to continue without logging in')
 
       server.sendmail(config.EMAIL_ADDRESS, address, msg.as_string())
-      log.info('Email notification sent to ' + address)
+      log.info(f'Email notification sent to {address}')
     else:
       log.info('Email notifications are disabled')
 

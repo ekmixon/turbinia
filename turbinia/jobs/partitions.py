@@ -44,8 +44,7 @@ class PartitionEnumerationJob(interface.TurbiniaJob):
     Returns:
         A list of tasks to schedule.
     """
-    tasks = [PartitionEnumerationTask() for _ in evidence]
-    return tasks
+    return [PartitionEnumerationTask() for _ in evidence]
 
 
 manager.JobsManager.RegisterJob(PartitionEnumerationJob)

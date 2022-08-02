@@ -79,10 +79,7 @@ class TaskLoader():
     Returns:
       bool: True if task with the given name exists, else False
     """
-    for task in TASK_LIST:
-      if task.lower() == task_name.lower():
-        return True
-    return False
+    return any(task.lower() == task_name.lower() for task in TASK_LIST)
 
   def get_task(self, task_name):
     """Gets an instantiated Task object for the given name.
@@ -187,11 +184,11 @@ def task_runner(obj, *args, **kwargs):
   """
 
   # GKE Specific - do not queue more work if pod places this file
-  if config.TASK_MANAGER.lower() == 'psq':
-    if os.path.exists(config.SCALEDOWN_WORKER_FILE):
-      # Late import because this is only needed for PSQ
-      import psq
-      raise psq.Retry()
+  if config.TASK_MANAGER.lower() == 'psq' and os.path.exists(
+      config.SCALEDOWN_WORKER_FILE):
+    # Late import because this is only needed for PSQ
+    import psq
+    raise psq.Retry()
 
   # Try to acquire lock, timeout and requeue task if the worker
   # is already processing a task.

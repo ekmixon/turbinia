@@ -105,7 +105,7 @@ class WindowsAccountAnalysisTask(TurbiniaTask):
           disk_path=evidence.local_path, output_dir=self.output_dir,
           credentials=evidence.credentials)
     except TurbiniaException as e:
-      raise TurbiniaException('artifact extraction failed: {}'.format(str(e)))
+      raise TurbiniaException(f'artifact extraction failed: {str(e)}')
 
     # Extract base dir from our list of collected artifacts
     location = os.path.dirname(collected_artifacts[0])
@@ -124,14 +124,18 @@ class WindowsAccountAnalysisTask(TurbiniaTask):
         hashnames (dict): Dict mapping hash back to username for convenience.
     """
 
-    # Default (empty) hash
-    IGNORE_CREDS = ['31d6cfe0d16ae931b73c59d7e0c089c0']
-
     hash_file = os.path.join(self.tmp_dir, 'windows_hashes')
     cmd = [
-        'secretsdump.py', '-system', location + '/SYSTEM', '-sam',
-        location + '/SAM', '-hashes', 'lmhash:nthash', 'LOCAL', '-outputfile',
-        hash_file
+        'secretsdump.py',
+        '-system',
+        f'{location}/SYSTEM',
+        '-sam',
+        f'{location}/SAM',
+        '-hashes',
+        'lmhash:nthash',
+        'LOCAL',
+        '-outputfile',
+        hash_file,
     ]
 
     impacket_log = os.path.join(self.output_dir, 'impacket.log')
@@ -139,19 +143,21 @@ class WindowsAccountAnalysisTask(TurbiniaTask):
 
     creds = []
     hashnames = {}
-    hash_file = hash_file + '.sam'
-    if os.path.isfile(hash_file):
-      with open(hash_file, 'r') as fh:
-        for line in fh:
-          (username, _, _, passwdhash, _, _, _) = line.split(':')
-          if passwdhash in IGNORE_CREDS:
-            continue
-          creds.append(line.strip())
-          hashnames[passwdhash] = username
-      os.remove(hash_file)
-    else:
+    hash_file = f'{hash_file}.sam'
+    if not os.path.isfile(hash_file):
       raise TurbiniaException('Extracted hash file not found.')
 
+    # Default (empty) hash
+    IGNORE_CREDS = ['31d6cfe0d16ae931b73c59d7e0c089c0']
+
+    with open(hash_file, 'r') as fh:
+      for line in fh:
+        (username, _, _, passwdhash, _, _, _) = line.split(':')
+        if passwdhash in IGNORE_CREDS:
+          continue
+        creds.append(line.strip())
+        hashnames[passwdhash] = username
+    os.remove(hash_file)
     return (creds, hashnames)
 
   def _analyse_windows_creds(self, creds, hashnames, timeout=300):
@@ -173,11 +179,8 @@ class WindowsAccountAnalysisTask(TurbiniaTask):
     summary = 'No weak passwords found'
     priority = Priority.LOW
 
-    # 1000 is "NTLM"
-    weak_passwords = bruteforce_password_hashes(
-        creds, tmp_dir=self.tmp_dir, timeout=timeout, extra_args='-m 1000')
-
-    if weak_passwords:
+    if weak_passwords := bruteforce_password_hashes(
+        creds, tmp_dir=self.tmp_dir, timeout=timeout, extra_args='-m 1000'):
       priority = Priority.CRITICAL
       summary = 'Registry analysis found {0:d} weak password(s)'.format(
           len(weak_passwords))

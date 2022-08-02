@@ -46,24 +46,21 @@ class PsortTask(TurbiniaTask):
 
     # Base command could be potentially placed in global configuration
     cmd = [base_command]
+    cli_args = [
+        'status_view', 'additional_fields', 'output_format', 'profilers'
+    ]
     for k, v in conf.items():
-      cli_args = [
-          'status_view', 'additional_fields', 'output_format', 'profilers'
-      ]
       if (k not in cli_args or not v):
         continue
       prepend = '-'
       if len(k) > 1:
         prepend = '--'
       if isinstance(v, list):
-        if v:
-          cmd.extend([prepend + k, ','.join(v)])
+        cmd.extend([prepend + k, ','.join(v)])
       elif isinstance(v, bool):
-        if v:
-          cmd.append(prepend + k)
+        cmd.append(prepend + k)
       elif isinstance(v, str):
-        if v:
-          cmd.extend([prepend + k, v])
+        cmd.extend([prepend + k, v])
     return cmd
 
   def run(self, evidence, result):

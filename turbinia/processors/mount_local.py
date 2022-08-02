@@ -152,9 +152,10 @@ def PreprocessLosetup(
     # https://github.com/google/turbinia/issues/73
     losetup_command = ['sudo', 'losetup', '--show', '--find', '-r']
     if partition_size:
-      # Evidence is DiskPartition
-      losetup_command.extend(['-o', str(partition_offset)])
-      losetup_command.extend(['--sizelimit', str(partition_size)])
+      losetup_command.extend(
+          ['-o',
+           str(partition_offset), '--sizelimit',
+           str(partition_size)])
     losetup_command.append(source_path)
     log.info('Running command {0:s}'.format(' '.join(losetup_command)))
     try:
@@ -299,11 +300,10 @@ def GetFilesystem(path):
     fstype = subprocess.check_output(cmd).split()
     if fstype:
       break
-    else:
-      log.debug(
-          'Filesystem type for {0:s} not found, retry {1:d} of {2:d}'.format(
-              path, retry, RETRY_MAX))
-      time.sleep(1)
+    log.debug(
+        'Filesystem type for {0:s} not found, retry {1:d} of {2:d}'.format(
+            path, retry, RETRY_MAX))
+    time.sleep(1)
 
   if len(fstype) != 1:
     raise TurbiniaException(

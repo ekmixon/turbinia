@@ -92,16 +92,15 @@ class TomcatAnalysisTask(TurbiniaTask):
 
     count = 0
     for password_entry in re.findall(tomcat_user_passwords_re, tomcat_file):
-      findings.append(fmt.bullet('Tomcat user: ' + password_entry.strip()))
+      findings.append(fmt.bullet(f'Tomcat user: {password_entry.strip()}'))
       count += 1
 
     for deployment_entry in re.findall(tomcat_deploy_re, tomcat_file):
-      findings.append(
-          fmt.bullet('Tomcat App Deployed: ' + deployment_entry.strip()))
+      findings.append(fmt.bullet(f'Tomcat App Deployed: {deployment_entry.strip()}'))
       count += 1
 
     for mgmt_entry in re.findall(tomcat_manager_activity_re, tomcat_file):
-      findings.append(fmt.bullet('Tomcat Management: ' + mgmt_entry.strip()))
+      findings.append(fmt.bullet(f'Tomcat Management: {mgmt_entry.strip()}'))
       count += 1
 
     if findings:

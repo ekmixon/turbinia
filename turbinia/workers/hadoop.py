@@ -79,19 +79,18 @@ class HadoopAnalysisTask(TurbiniaTask):
     if evil_commands:
       msg = 'Found suspicious commands!'
       report.append(fmt.heading4(fmt.bold(msg)))
-      summary = msg
       priority = Priority.CRITICAL
     else:
       msg = 'Did not find any suspicious commands.'
       report.append(fmt.heading4(msg))
-      summary = msg
-
+    summary = msg
     for filepath, command in evil_commands:
-      report.append(fmt.bullet(fmt.bold('Command:')))
-      report.append(fmt.code(command))
-      report.append('Found in file:')
-      report.append(fmt.code(filepath))
-
+      report.extend((
+          fmt.bullet(fmt.bold('Command:')),
+          fmt.code(command),
+          'Found in file:',
+          fmt.code(filepath),
+      ))
     msg = 'Extracted {0:d} strings from {1:d} file(s)'.format(
         strings_count, len(collected_artifacts))
     report.append(fmt.bullet(msg))

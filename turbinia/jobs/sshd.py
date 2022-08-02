@@ -50,10 +50,9 @@ class SSHDExtractionJob(interface.TurbiniaJob):
     Returns:
         A list of tasks to schedule.
     """
-    tasks = [
+    return [
         artifact.FileArtifactExtractionTask('SshdConfigFile') for _ in evidence
     ]
-    return tasks
 
 
 class SSHDAnalysisJob(interface.TurbiniaJob):
@@ -73,11 +72,10 @@ class SSHDAnalysisJob(interface.TurbiniaJob):
     Returns:
         A list of tasks to schedule.
     """
-    tasks = []
-    for evidence_item in evidence:
-      if evidence_item.artifact_name == 'SshdConfigFile':
-        tasks.append(sshd.SSHDAnalysisTask())
-    return tasks
+    return [
+        sshd.SSHDAnalysisTask() for evidence_item in evidence
+        if evidence_item.artifact_name == 'SshdConfigFile'
+    ]
 
 
 manager.JobsManager.RegisterJobs([SSHDAnalysisJob, SSHDExtractionJob])

@@ -67,14 +67,11 @@ def GetPartitionEncryptionType(path_spec):
   Returns:
     String representing the type of encryption, or None.
   """
-  encryption_type = None
-
   if not path_spec.HasParent():
     return None
 
-  if path_spec.parent.type_indicator == dfvfs_definitions.TYPE_INDICATOR_BDE:
-    encryption_type = 'BDE'
-  return encryption_type
+  return ('BDE' if path_spec.parent.type_indicator ==
+          dfvfs_definitions.TYPE_INDICATOR_BDE else None)
 
 
 def GetPathSpecByLocation(path_specs, location):

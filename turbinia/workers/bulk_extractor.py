@@ -75,9 +75,7 @@ class BulkExtractorTask(TurbiniaTask):
 
     try:
       # Generate the command we want to run then execute.
-      cmd = ['bulk_extractor']
-
-      cmd.extend(['-o', output_file_path])
+      cmd = ['bulk_extractor', *['-o', output_file_path]]
 
       if bulk_extractor_args:
         cmd.extend(bulk_extractor_args)
@@ -109,13 +107,9 @@ class BulkExtractorTask(TurbiniaTask):
     Returns:
       xml_hit(str): the xml value else return N/A.
     """
-    xml_hit = 'N/A'
     xml_search = self.xml.find(xml_key)
 
-    # If exists, return the text value.
-    if xml_search is not None:
-      xml_hit = xml_search.text
-    return xml_hit
+    return xml_search.text if xml_search is not None else 'N/A'
 
   def generate_summary_report(self, output_file_path):
     """Generate a summary report from the resulting bulk extractor run.
@@ -143,29 +137,22 @@ class BulkExtractorTask(TurbiniaTask):
     # Place in try/except statement to continue execution when
     # an attribute is not found and NoneType is returned.
     try:
-      # Retrieve summary related results.
-      findings.append(fmt.heading4('Bulk Extractor Results'))
-      findings.append(fmt.heading5('Run Summary'))
-      findings.append(
-          fmt.bullet(
-              'Program: {0} - {1}'.format(
-                  self.check_xml_attrib('creator/program'),
-                  self.check_xml_attrib('creator/version'))))
-      findings.append(
-          fmt.bullet(
-              'Command Line: {0}'.format(
-                  self.check_xml_attrib(
-                      'creator/execution_environment/command_line'))))
-      findings.append(
-          fmt.bullet(
-              'Start Time: {0}'.format(
-                  self.check_xml_attrib(
-                      'creator/execution_environment/start_time'))))
-      findings.append(
-          fmt.bullet(
-              'Elapsed Time: {0}'.format(
-                  self.check_xml_attrib('report/elapsed_seconds'))))
-
+      findings.extend((
+          fmt.heading4('Bulk Extractor Results'),
+          fmt.heading5('Run Summary'),
+          fmt.bullet('Program: {0} - {1}'.format(
+              self.check_xml_attrib('creator/program'),
+              self.check_xml_attrib('creator/version'),
+          )),
+          fmt.bullet('Command Line: {0}'.format(
+              self.check_xml_attrib(
+                  'creator/execution_environment/command_line'))),
+          fmt.bullet('Start Time: {0}'.format(
+              self.check_xml_attrib(
+                  'creator/execution_environment/start_time'))),
+          fmt.bullet('Elapsed Time: {0}'.format(
+              self.check_xml_attrib('report/elapsed_seconds'))),
+      ))
       # Retrieve results from each of the scanner runs
       feature_files = self.xml.find('feature_files')
       if feature_files is not None:

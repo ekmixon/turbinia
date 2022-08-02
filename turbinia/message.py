@@ -46,11 +46,11 @@ class TurbiniaRequest:
       self, request_id=None, requester=None, recipe=None, context=None,
       evidence_=None):
     """Initialization for TurbiniaRequest."""
-    self.request_id = request_id if request_id else uuid.uuid4().hex
-    self.requester = requester if requester else 'user_unspecified'
-    self.recipe = recipe if recipe else {'globals': {}}
-    self.context = context if context else {}
-    self.evidence = evidence_ if evidence_ else []
+    self.request_id = request_id or uuid.uuid4().hex
+    self.requester = requester or 'user_unspecified'
+    self.recipe = recipe or {'globals': {}}
+    self.context = context or {}
+    self.evidence = evidence_ or []
     self.type = self.__class__.__name__
 
   def to_json(self):

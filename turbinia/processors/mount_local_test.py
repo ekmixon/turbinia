@@ -28,9 +28,7 @@ from turbinia.processors import mount_local
 
 def _mock_returns(*args, **kwargs):
   """Mock return values."""
-  if args[0] == '/dev/loop0p4':
-    return False
-  return True
+  return args[0] != '/dev/loop0p4'
 
 
 class MountLocalProcessorTest(unittest.TestCase):
